@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USIU Student Support | AI-Powered Multi-Agent System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a4d2e;
+            --primary-light: #2d6a4f;
+            --accent: #f77f00;
+            --accent-light: #fcbf49;
+            --bg: #faf9f6;
+            --surface: #ffffff;
+            --text: #1a1a1a;
+            --text-muted: #666;
+            --border: #e0e0e0;
+            --agent-greeter: #06d6a0;
+            --agent-academic: #118ab2;
+            --agent-finance: #ef476f;
+            --agent-student: #ffd166;
+            --agent-it: #073b4c;
+            --agent-reviewer: #9b59b6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(135deg, var(--bg) 0%, #e8f4ea 100%);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            box-shadow: 0 8px 24px rgba(26, 77, 46, 0.2);
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Main Layout */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 968px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Agent Status Panel */
+        .agent-panel {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 2rem;
+            animation: fadeInLeft 0.8s ease-out;
+        }
+
+        .agent-panel h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            font-family: 'Space Mono', monospace;
+        }
+
+        .agent-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .agent-item {
+            padding: 1rem;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .agent-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .agent-item.active {
+            border-color: var(--accent);
+            background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent) 100%);
+            color: white;
+            box-shadow: 0 6px 20px rgba(247, 127, 0, 0.3);
+        }
+
+        .agent-name {
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .agent-role {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        .agent-status {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ddd;
+            margin-right: 0.5rem;
+        }
+
+        .agent-status.active {
+            background: #06d6a0;
+            animation: pulse 2s infinite;
+        }
+
+        /* Chat Interface */
+        .chat-container {
+            background: var(--surface);
+            border-radius: 20px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 700px;
+            animation: fadeInRight 0.8s ease-out;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .status-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+            background: linear-gradient(to bottom, #fafafa 0%, var(--bg) 100%);
+        }
+
+        .message {
+            margin-bottom: 1.5rem;
+            animation: messageSlideIn 0.4s ease-out;
+        }
+
+        @keyframes messageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            color: white;
+        }
+
+        .user-avatar {
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+        }
+
+        .agent-avatar {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+        }
+
+        .message-meta {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .message-content {
+            margin-left: 44px;
+            padding: 1.2rem;
+            border-radius: 16px;
+            line-height: 1.6;
+        }
+
+        .user-message .message-content {
+            background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent) 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .agent-message .message-content {
+            background: white;
+            border: 2px solid var(--border);
+            border-bottom-left-radius: 4px;
+        }
+
+        .agent-tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            font-family: 'Space Mono', monospace;
+        }
+
+        /* Chat Input */
+        .chat-input-container {
+            padding: 1.5rem 2rem;
+            background: white;
+            border-top: 2px solid var(--border);
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            border: 2px solid var(--border);
+            border-radius: 25px;
+            font-size: 1rem;
+            font-family: 'DM Sans', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(26, 77, 46, 0.1);
+        }
+
+        .send-button {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .send-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(26, 77, 46, 0.3);
+        }
+
+        .send-button:active {
+            transform: translateY(0);
+        }
+
+        .send-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .quick-action {
+            padding: 0.6rem 1.2rem;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .quick-action:hover {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Loading Indicator */
+        .loading {
+            display: flex;
+            gap: 0.5rem;
+            padding: 1rem;
+        }
+
+        .loading-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--primary);
+            animation: loadingBounce 1.4s infinite ease-in-out both;
+        }
+
+        .loading-dot:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes loadingBounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Error Message */
+        .error-message {
+            background: #fee;
+            border: 2px solid #fcc;
+            color: #c33;
+            padding: 1rem;
+            border-radius: 12px;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">🎓</div>
+            </div>
+            <h1>USIU Student Support</h1>
+            <p class="subtitle">AI-Powered Multi-Agent Assistant</p>
+        </header>
+
+        <div class="main-layout">
+            <!-- Agent Status Panel -->
+            <aside class="agent-panel">
+                <h3>🤖 Active Agents</h3>
+                <div class="agent-list">
+                    <div class="agent-item" data-agent="greeter">
+                        <div class="agent-name">
+                            <span class="agent-status"></span>
+                            Greeter
+                        </div>
+                        <div class="agent-role">Intent Classifier</div>
+                    </div>
+                    <div class="agent-item" data-agent="academic">
+                        <div class="agent-name">
+                            <span class="agent-status"></span>
+                            Academic Advisor
+                        </div>
+                        <div class="agent-role">Courses & Registration</div>
+                    </div>
+                    <div class="agent-item" data-agent="finance">
+                        <div class="agent-name">
+                            <span class="agent-status"></span>
+                            Finance
+                        </div>
+                        <div class="agent-role">Tuition & Scholarships</div>
+                    </div>
+                    <div class="agent-item" data-agent="student-life">
+                        <div class="agent-name">
+                            <span class="agent-status"></span>
+                            Student Life
+                        </div>
+                        <div class="agent-role">Housing & Events</div>
+                    </div>
+                    <div class="agent-item" data-agent="it">
+                        <div class="agent-name">
+                            <span class="agent-status"></span>
+                            IT Support
+                        </div>
+                        <div class="agent-role">Portal & Technical</div>
+                    </div>
+                    <div class="agent-item" data-agent="reviewer">
+                        <div class="agent-name">
+                            <span class="agent-status"></span>
+                            Quality Reviewer
+                        </div>
+                        <div class="agent-role">Response Validation</div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Chat Interface -->
+            <main class="chat-container">
+                <div class="chat-header">
+                    <div class="chat-title">💬 Chat with USIU Support</div>
+                    <div class="status-badge">● Online</div>
+                </div>
+
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message agent-message">
+                        <div class="message-header">
+                            <div class="message-avatar agent-avatar">U</div>
+                            <div class="message-meta">USIU Support • Just now</div>
+                        </div>
+                        <div class="message-content">
+                            <span class="agent-tag" style="background: var(--agent-greeter); color: white;">Greeter Agent</span>
+                            <p>👋 Hello! Welcome to USIU Student Support. I'm here to help with:</p>
+                            <ul style="margin: 1rem 0; padding-left: 1.5rem;">
+                                <li>Course registration & academic queries</li>
+                                <li>Tuition fees & scholarships</li>
+                                <li>Student housing & campus life</li>
+                                <li>Portal access & technical issues</li>
+                            </ul>
+                            <p>How can I assist you today?</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-input-container">
+                    <div class="quick-actions">
+                        <button class="quick-action" onclick="setQuickQuery('When is registration deadline?')">📅 Registration Deadline</button>
+                        <button class="quick-action" onclick="setQuickQuery('How much is tuition?')">💰 Tuition Fees</button>
+                        <button class="quick-action" onclick="setQuickQuery('Portal login issues')">🔧 Portal Help</button>
+                        <button class="quick-action" onclick="setQuickQuery('Student clubs available')">🎭 Campus Life</button>
+                    </div>
+                    <div class="chat-input-wrapper">
+                        <input 
+                            type="text" 
+                            class="chat-input" 
+                            id="userInput"
+                            placeholder="Type your question here..."
+                            onkeypress="handleKeyPress(event)"
+                        >
+                        <button class="send-button" onclick="sendMessage()">Send</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Simulated multi-agent system (in production, this would call the Python backend)
+        const USIU_KB = {
+            academic: {
+                keywords: ['registration', 'course', 'class', 'schedule', 'gpa', 'grades', 'credits', 'prerequisite'],
+                responses: {
+                    registration: "📅 Registration for Spring 2026 semester:\n\n• Regular: January 6-17, 2026\n• Late (with penalty): January 20-24, 2026\n\nTo register:\n1. Log into student portal\n2. Pay at least 60% of fees\n3. Clear any holds (library fines, academic)\n4. Select courses and submit\n\nNeed help? I'm here!",
+                    courses: "📚 Course Information:\n\nExample: DSA 2020A - Artificial Intelligence\n• Credits: 3\n• Instructor: Dr. Kimani\n• Schedule: Mon/Wed 2:00-3:30 PM\n• Lab: Friday 10:00-12:00\n• Prerequisites: DSA 1011\n\nWhich specific course are you interested in?",
+                    gpa: "📊 GPA Calculation:\n\nFormula: (Grade points × credit hours) ÷ total credit hours\n\nGrading Scale:\nA = 4.0 | A- = 3.7\nB+ = 3.3 | B = 3.0 | B- = 2.7\nC+ = 2.3 | C = 2.0 | C- = 1.7\nD+ = 1.3 | D = 1.0\nF = 0.0"
+                }
+            },
+            finance: {
+                keywords: ['tuition', 'fee', 'payment', 'scholarship', 'financial', 'cost', 'price', 'money'],
+                responses: {
+                    tuition: "💰 Tuition Rates:\n\n• Undergraduate: $850 per credit hour\n• Graduate: $950 per credit hour\n• Payment plans: 3-4 installments available\n\nPayment Methods:\n✓ M-Pesa\n✓ Bank transfer\n✓ Credit card (Visa/Mastercard)\n✓ In-person at cashier\n\nQuestions about your account? Contact finance office!",
+                    scholarship: "🎓 Scholarships Available:\n\n1. Merit-based (25-50% tuition waiver)\n   • Requirement: GPA 3.5+\n   • Application: Automatic consideration\n\n2. Need-based\n   • Apply through financial aid office\n   • Required documents needed\n\n3. Athletic scholarships\n   • Contact: Sports department\n\nWant to know more about a specific scholarship?"
+                }
+            },
+            student_life: {
+                keywords: ['housing', 'club', 'event', 'campus', 'activities', 'dorm', 'residence'],
+                responses: {
+                    housing: "🏠 Housing Options:\n\nOn-Campus:\n• Limited spaces available\n• Cost: $1,200-$1,800/semester\n• Apply by: December 15 for Spring\n\nOff-Campus:\n• Verified landlord list available\n• Contact housing office\n\nNeed help with your housing application?",
+                    clubs: "🎭 Student Clubs & Activities:\n\n60+ clubs including:\n• Debate Society\n• Tech & Innovation Club\n• Drama & Theatre\n• Sports Clubs\n• Cultural Associations\n• Academic Societies\n\nJoin via student portal!\n\nInterested in a specific type of club?"
+                }
+            },
+            it_support: {
+                keywords: ['portal', 'password', 'email', 'login', 'wifi', 'technical', 'access', 'reset'],
+                responses: {
+                    portal: "🔐 Student Portal Help:\n\nAccess: https://portal.usiu.ac.ke\n• Username: Your student ID\n• Password issues? Visit IT helpdesk\n\nCommon solutions:\n1. Clear browser cache\n2. Try different browser\n3. Verify student ID format\n\nStill having issues? Visit IT helpdesk or call +254 730 116 000",
+                    email: "📧 Email Access:\n\nFormat: firstname.lastname@usiu.ac.ke\n• Access via Office 365\n• Same credentials as portal\n\nTroubleshooting:\n• Reset at IT helpdesk\n• Check spam folder\n• Verify email forwarding settings\n\nNeed immediate help? IT helpdesk hours: Mon-Fri 8AM-5PM"
+                }
+            }
+        };
+
+        let activeAgent = 'greeter';
+        let messageCount = 0;
+
+        function setQuickQuery(query) {
+            document.getElementById('userInput').value = query;
+            sendMessage();
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function classifyIntent(message) {
+            const lower = message.toLowerCase();
+            
+            for (const [category, data] of Object.entries(USIU_KB)) {
+                if (data.keywords.some(keyword => lower.includes(keyword))) {
+                    return category;
+                }
+            }
+            return 'general';
+        }
+
+        function getResponse(intent, message) {
+            const lower = message.toLowerCase();
+            const category = USIU_KB[intent];
+            
+            if (!category) {
+                return "I'd be happy to help! Could you provide more details about your question? I can assist with academic, financial, student life, or technical matters.";
+            }
+
+            // Match specific keywords to responses
+            for (const [key, response] of Object.entries(category.responses)) {
+                if (lower.includes(key)) {
+                    return response;
+                }
+            }
+
+            // Default category response
+            return category.responses[Object.keys(category.responses)[0]];
+        }
+
+        function highlightAgent(agentName) {
+            document.querySelectorAll('.agent-item').forEach(item => {
+                item.classList.remove('active');
+                item.querySelector('.agent-status').classList.remove('active');
+            });
+
+            const agentMap = {
+                'greeter': 'greeter',
+                'academic': 'academic',
+                'finance': 'finance',
+                'student_life': 'student-life',
+                'it_support': 'it',
+                'quality_reviewer': 'reviewer'
+            };
+
+            const selector = agentMap[agentName];
+            if (selector) {
+                const item = document.querySelector(`[data-agent="${selector}"]`);
+                if (item) {
+                    item.classList.add('active');
+                    item.querySelector('.agent-status').classList.add('active');
+                }
+            }
+        }
+
+        function addMessage(content, isUser = false, agentName = null) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'agent-message'}`;
+
+            const agentColors = {
+                'greeter': 'var(--agent-greeter)',
+                'academic': 'var(--agent-academic)',
+                'finance': 'var(--agent-finance)',
+                'student_life': 'var(--agent-student)',
+                'it_support': 'var(--agent-it)',
+                'quality_reviewer': 'var(--agent-reviewer)'
+            };
+
+            const agentNames = {
+                'greeter': 'Greeter Agent',
+                'academic': 'Academic Advisor',
+                'finance': 'Finance Agent',
+                'student_life': 'Student Life Agent',
+                'it_support': 'IT Support Agent',
+                'quality_reviewer': 'Quality Reviewer'
+            };
+
+            let html = `
+                <div class="message-header">
+                    <div class="message-avatar ${isUser ? 'user-avatar' : 'agent-avatar'}">
+                        ${isUser ? 'S' : 'U'}
+                    </div>
+                    <div class="message-meta">
+                        ${isUser ? 'You' : 'USIU Support'} • Just now
+                    </div>
+                </div>
+                <div class="message-content">
+            `;
+
+            if (!isUser && agentName) {
+                html += `<span class="agent-tag" style="background: ${agentColors[agentName]}; color: white;">
+                    ${agentNames[agentName]}
+                </span>`;
+            }
+
+            html += `<p>${content.replace(/\n/g, '<br>')}</p></div>`;
+            
+            messageDiv.innerHTML = html;
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function showLoading() {
+            const messagesDiv = document.getElementById('chatMessages');
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'loading';
+            loadingDiv.id = 'loadingIndicator';
+            loadingDiv.innerHTML = `
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
+            `;
+            messagesDiv.appendChild(loadingDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function hideLoading() {
+            const loading = document.getElementById('loadingIndicator');
+            if (loading) loading.remove();
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            // Add user message
+            addMessage(message, true);
+            input.value = '';
+
+            // Show loading
+            showLoading();
+
+            // Simulate agent processing
+            setTimeout(() => {
+                // Greeter classifies intent
+                highlightAgent('greeter');
+                setTimeout(() => {
+                    const intent = classifyIntent(message);
+                    
+                    // Route to specialist
+                    setTimeout(() => {
+                        hideLoading();
+                        highlightAgent(intent);
+                        
+                        const response = getResponse(intent, message);
+                        addMessage(response, false, intent);
+
+                        // Quality review
+                        setTimeout(() => {
+                            highlightAgent('quality_reviewer');
+                        }, 1000);
+                    }, 1000);
+                }, 500);
+            }, 500);
+        }
+
+        // Initialize
+        highlightAgent('greeter');
+    </script>
+</body>
+</html>
